@@ -5,6 +5,9 @@ import SignUp from '../pages/auth/SignUp';
 import Login from '../pages/auth/Login';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 
+// Student Layout
+import StudentLayout from '../components/StudentLayout';
+
 // Student Pages
 import StudentDashboard from '../pages/student/StudentDashboard';
 import StudentCourses from '../pages/student/courses/StudentCourses';
@@ -13,6 +16,8 @@ import LessonView from '../pages/student/lessons/LessonView';
 import StudentAssessments from '../pages/student/assessments/StudentAssessments';
 import StudentAttendance from '../pages/student/attendance/StudentAttendance';
 import StudentProfile from '../pages/student/profile/StudentProfile';
+import StudentResults from '../pages/student/results/StudentResults';
+import StudentMessages from '../pages/student/messages/StudentMessages';
 
 // Lecturer Pages
 import LecturerDashboard from '../pages/lecturer/LecturerDashboard';
@@ -54,77 +59,24 @@ const VTCRoutes = () => {
 
         {/* Student Routes */}
         <Route
-          path="/student/dashboard"
+          path="/student"
           element={
             <ProtectedRoute allowedRole="student">
-              <StudentDashboard />
+              <StudentLayout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/student/courses"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <StudentCourses />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/course/:courseId"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <CourseDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/course/:courseId/lesson/:lessonId"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <LessonView />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/assessments"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <StudentAssessments />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/attendance"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <StudentAttendance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/results"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <div className="p-8">Results & Certificates Page (Coming Soon)</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/messages"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <div className="p-8">Messages & Announcements Page (Coming Soon)</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/student/profile"
-          element={
-            <ProtectedRoute allowedRole="student">
-              <StudentProfile />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route index element={<Navigate to="/student/dashboard" replace />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="courses" element={<StudentCourses />} />
+          <Route path="course/:courseId" element={<CourseDetails />} />
+          <Route path="course/:courseId/lesson/:lessonId" element={<LessonView />} />
+          <Route path="assessments" element={<StudentAssessments />} />
+          <Route path="attendance" element={<StudentAttendance />} />
+          <Route path="results" element={<StudentResults />} />
+          <Route path="messages" element={<StudentMessages />} />
+          <Route path="profile" element={<StudentProfile />} />
+        </Route>
 
         {/* Lecturer Routes */}
         <Route

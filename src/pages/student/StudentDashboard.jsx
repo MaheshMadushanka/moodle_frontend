@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, TrendingUp, Calendar, Bell, ArrowRight, PlayCircle } from 'lucide-react';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -14,11 +15,6 @@ const StudentDashboard = () => {
     setUser(currentUser);
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    navigate('/login');
-  };
-
   // Mock data
   const stats = {
     enrolledCourses: 5,
@@ -28,148 +24,188 @@ const StudentDashboard = () => {
   };
 
   const upcomingClasses = [
-    { id: 1, course: 'Web Development', date: '2026-02-05', time: '10:00 AM' },
-    { id: 2, course: 'Database Management', date: '2026-02-06', time: '2:00 PM' },
-    { id: 3, course: 'Mobile App Development', date: '2026-02-07', time: '11:00 AM' }
+    { id: 1, course: 'Web Development', date: 'Feb 5, 2026', time: '10:00 AM', color: 'bg-blue-500' },
+    { id: 2, course: 'Database Management', date: 'Feb 6, 2026', time: '2:00 PM', color: 'bg-green-500' },
+    { id: 3, course: 'Mobile App Development', date: 'Feb 7, 2026', time: '11:00 AM', color: 'bg-purple-500' }
   ];
 
   const announcements = [
-    { id: 1, title: 'New Assignment Posted', course: 'Web Development', date: '2 hours ago' },
-    { id: 2, title: 'Class Schedule Change', course: 'Database Management', date: '1 day ago' },
-    { id: 3, title: 'Exam Date Announced', course: 'Mobile App Development', date: '3 days ago' }
+    { id: 1, title: 'New Assignment Posted', course: 'Web Development', date: '2 hours ago', type: 'assignment' },
+    { id: 2, title: 'Class Schedule Change', course: 'Database Management', date: '1 day ago', type: 'schedule' },
+    { id: 3, title: 'Exam Date Announced', course: 'Mobile App Development', date: '3 days ago', type: 'exam' }
+  ];
+
+  const continueLearning = [
+    { id: 1, course: 'Web Development', lesson: 'React Hooks', progress: 75 },
+    { id: 2, course: 'Database Management', lesson: 'SQL Joins', progress: 45 },
   ];
 
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">Student Dashboard</h1>
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600">Welcome, {user.email}</span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Welcome Back, Student! 👋</h1>
+        <p className="text-gray-600 mt-1">Here's what's happening with your courses today.</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <BookOpen size={24} />
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <span className="text-xl font-bold">{stats.enrolledCourses}</span>
+            </div>
+          </div>
+          <h3 className="text-sm font-medium opacity-90">Enrolled Courses</h3>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <TrendingUp size={24} />
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <span className="text-xl font-bold">{stats.overallProgress}%</span>
+            </div>
+          </div>
+          <h3 className="text-sm font-medium opacity-90">Overall Progress</h3>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <Calendar size={24} />
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <span className="text-xl font-bold">{stats.upcomingClasses}</span>
+            </div>
+          </div>
+          <h3 className="text-sm font-medium opacity-90">Upcoming Classes</h3>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center justify-between mb-2">
+            <PlayCircle size={24} />
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <span className="text-xl font-bold">{stats.completedLessons}</span>
+            </div>
+          </div>
+          <h3 className="text-sm font-medium opacity-90">Completed Lessons</h3>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Continue Learning */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Continue Learning</h2>
+              <button 
+                onClick={() => navigate('/student/courses')}
+                className="text-indigo-600 hover:text-indigo-700 font-medium text-sm flex items-center gap-1"
               >
-                Logout
+                View All <ArrowRight size={16} />
               </button>
             </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium">Enrolled Courses</p>
-                <p className="text-3xl font-bold mt-2">{stats.enrolledCourses}</p>
-              </div>
-              <div className="bg-white/20 rounded-full p-3">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm font-medium">Overall Progress</p>
-                <p className="text-3xl font-bold mt-2">{stats.overallProgress}%</p>
-              </div>
-              <div className="bg-white/20 rounded-full p-3">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm font-medium">Upcoming Classes</p>
-                <p className="text-3xl font-bold mt-2">{stats.upcomingClasses}</p>
-              </div>
-              <div className="bg-white/20 rounded-full p-3">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-orange-100 text-sm font-medium">Completed Lessons</p>
-                <p className="text-3xl font-bold mt-2">{stats.completedLessons}</p>
-              </div>
-              <div className="bg-white/20 rounded-full p-3">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upcoming Classes */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Upcoming Classes</h2>
+            
             <div className="space-y-4">
-              {upcomingClasses.map((class_) => (
-                <div key={class_.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">{class_.course}</h3>
-                    <p className="text-sm text-gray-600">{class_.date} at {class_.time}</p>
+              {continueLearning.map((item) => (
+                <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex gap-4">
+                    <div className="w-32 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center">
+                      <PlayCircle size={32} className="text-indigo-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{item.course}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{item.lesson}</p>
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                          <span>Progress</span>
+                          <span>{item.progress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all"
+                            style={{ width: `${item.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition">
-                    Join
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upcoming Classes */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Upcoming Classes</h2>
+            <div className="space-y-3">
+              {upcomingClasses.map((cls) => (
+                <div key={cls.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className={`w-12 h-12 ${cls.color} rounded-lg flex items-center justify-center text-white font-bold`}>
+                    {cls.date.split(' ')[1].split(',')[0]}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{cls.course}</h3>
+                    <p className="text-sm text-gray-600">{cls.date} • {cls.time}</p>
+                  </div>
+                  <button className="text-indigo-600 hover:text-indigo-700">
+                    <ArrowRight size={20} />
                   </button>
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Latest Announcements */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Latest Announcements</h2>
+        {/* Announcements */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Bell size={20} className="text-indigo-600" />
+              <h2 className="text-xl font-bold text-gray-900">Announcements</h2>
+            </div>
+            
             <div className="space-y-4">
               {announcements.map((announcement) => (
-                <div key={announcement.id} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800">{announcement.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{announcement.course}</p>
-                    </div>
-                    <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{announcement.date}</span>
-                  </div>
+                <div key={announcement.id} className="border-l-4 border-indigo-500 pl-4 py-2">
+                  <h3 className="font-semibold text-gray-900 text-sm">{announcement.title}</h3>
+                  <p className="text-xs text-gray-600 mt-1">{announcement.course}</p>
+                  <p className="text-xs text-gray-500 mt-1">{announcement.date}</p>
                 </div>
               ))}
             </div>
+            
+            <button 
+              onClick={() => navigate('/student/messages')}
+              className="w-full mt-6 py-2 px-4 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors font-medium text-sm"
+            >
+              View All Announcements
+            </button>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-lg p-6 mt-6 text-white">
+            <h3 className="font-bold text-lg mb-4">Quick Actions</h3>
+            <div className="space-y-3">
+              <button 
+                onClick={() => navigate('/student/assessments')}
+                className="w-full bg-white/20 hover:bg-white/30 backdrop-blur rounded-lg p-3 text-left transition-all"
+              >
+                <div className="font-medium">View Assessments</div>
+                <div className="text-xs opacity-90 mt-1">Check pending quizzes & assignments</div>
+              </button>
+              <button 
+                onClick={() => navigate('/student/results')}
+                className="w-full bg-white/20 hover:bg-white/30 backdrop-blur rounded-lg p-3 text-left transition-all"
+              >
+                <div className="font-medium">My Results</div>
+                <div className="text-xs opacity-90 mt-1">View grades & certificates</div>
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Continue Learning Button */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => navigate('/student/courses')}
-            className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl"
-          >
-            Continue Learning →
-          </button>
-        </div>
-      </main>
+      </div>
     </div>
   );
 };
