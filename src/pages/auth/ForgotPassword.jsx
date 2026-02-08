@@ -8,7 +8,7 @@ const ForgotPassword = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+    //hi
     // Simulate password reset email sent
     setSuccess(true);
     
