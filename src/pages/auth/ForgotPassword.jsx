@@ -1,73 +1,326 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+import Logo from "../../assets/vtclogo2.png";
 
-const ForgotPassword = () => {
+function ForgotPassword() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [formData, setFormData] = useState({
+    email: '',
+    otp: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
-  const handleSubmit = (e) => {
+  const handleEmailSubmit = (e) => {
     e.preventDefault();
-    //hi
-    // Simulate password reset email sent
-    setSuccess(true);
+    console.log('Email submitted:', formData.email);
     
-    // Redirect to login after 3 seconds
+    // Show loading toast
+    const loadingToast = toast.loading('Sending OTP...');
+    
+    // Simulate API call
     setTimeout(() => {
-      navigate('/login');
-    }, 3000);
+      toast.dismiss(loadingToast);
+      toast.success('OTP sent successfully to your email!', {
+        duration: 4000,
+        icon: '📧',
+      });
+      setStep(2);
+    }, 1500);
+  };
+
+  const handleOTPSubmit = (e) => {
+    e.preventDefault();
+    
+    if (formData.otp) {
+      const loadingToast = toast.loading('Verifying OTP...');
+      
+      setTimeout(() => {
+        toast.dismiss(loadingToast);
+        toast.success('OTP verified successfully!', {
+          duration: 3000,
+          icon: '✅',
+        });
+        setStep(3);
+      }, 1000);
+    } else {
+      toast.error('Please enter OTP', {
+        duration: 3000,
+      });
+    }
+  };
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    
+    if (formData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters!', {
+        duration: 3000,
+        icon: '⚠️',
+      });
+      return;
+    }
+    
+    if (formData.newPassword === formData.confirmPassword) {
+      const loadingToast = toast.loading('Resetting password...');
+      
+      setTimeout(() => {
+        toast.dismiss(loadingToast);
+        toast.success('Password reset successful! Redirecting to login...', {
+          duration: 3000,
+          icon: '🎉',
+        });
+        
+        // Redirect to login after 3 seconds
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
+      }, 1500);
+    } else {
+      toast.error('Passwords do not match!', {
+        duration: 3000,
+        icon: '❌',
+      });
+    }
+  };
+
+  const handleResendOTP = () => {
+    const loadingToast = toast.loading('Resending OTP...');
+    
+    setTimeout(() => {
+      toast.dismiss(loadingToast);
+      toast.success('OTP resent successfully!', {
+        duration: 3000,
+        icon: '🔄',
+      });
+    }, 1500);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Forgot Password</h1>
-          <p className="text-gray-600">Enter your email to reset your password</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      {/* Toast Container with custom styling */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          // Define default options
+          className: '',
+          duration: 4000,
+          style: {
+            background: '#fff',
+            color: '#363636',
+            padding: '16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            fontWeight: '500',
+          },
+          // Success toast styling
+          success: {
+            style: {
+              background: '#10B981',
+              color: '#fff',
+            },
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#10B981',
+            },
+          },
+          // Error toast styling
+          error: {
+            style: {
+              background: '#EF4444',
+              color: '#fff',
+            },
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#EF4444',
+            },
+          },
+          // Loading toast styling
+          loading: {
+            style: {
+              background: '#3B82F6',
+              color: '#fff',
+            },
+          },
+        }}
+      />
+
+      <div className="flex flex-col lg:flex-row bg-white rounded-lg shadow-xl overflow-hidden max-w-4xl w-full">
+        
+        {/* Left Side - Welcome Section */}
+        <div className="w-full lg:w-2/5 p-8 md:p-12 flex flex-col justify-center items-center bg-white">
+          <img src={Logo} alt="VTC Logo" className="w-24 h-24 md:w-32 md:h-32 mb-6 md:mb-10" />
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 text-center leading-relaxed">
+            Password<br />
+            Recovery
+          </h1>
+          <p className="text-gray-600 text-center mt-3 md:mt-4 text-sm md:text-base">
+            {step === 1 && "Enter your email to receive OTP"}
+            {step === 2 && "Enter the OTP sent to your email"}
+            {step === 3 && "Create a new password"}
+          </p>
+          
+          {/* Step Indicator */}
+          <div className="flex items-center gap-2 mt-6">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+              1
+            </div>
+            <div className={`w-8 h-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+              2
+            </div>
+            <div className={`w-8 h-1 ${step >= 3 ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${step >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+              3
+            </div>
+          </div>
         </div>
 
-        {success ? (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-center">
-            <p className="font-semibold mb-2">✓ Password reset link sent!</p>
-            <p className="text-sm">Check your email for the reset link.</p>
-            <p className="text-sm mt-2">Redirecting to login...</p>
+        {/* Right Side - Form Section */}
+        <div className="w-full lg:w-3/5 bg-gradient-to-b from-blue-800 to-blue-900 p-8 md:p-12 flex items-center justify-center">
+          <div className="w-full max-w-sm">
+            
+            {/* Step 1: Email Input */}
+            {step === 1 && (
+              <>
+                <h2 className="text-white text-lg md:text-xl font-semibold mb-6 md:mb-8">
+                  Forgot Password
+                </h2>
+                <form onSubmit={handleEmailSubmit} className="space-y-4 md:space-y-5">
+                  <div>
+                    <label className="block text-white text-sm mb-2">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-blue-700 bg-opacity-50 border border-blue-600 rounded text-white text-sm placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+
+                  <div className="pt-4">
+                    <button
+                      type="submit"
+                      className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                    >
+                      SEND OTP
+                    </button>
+                  </div>
+
+                  <div className="pt-2">
+                    <Link
+                      to="/"
+                      className="text-blue-200 hover:text-white text-xs font-medium transition-colors uppercase tracking-wide"
+                    >
+                      ← BACK TO LOGIN
+                    </Link>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* Step 2: OTP Input */}
+            {step === 2 && (
+              <>
+                <h2 className="text-white text-lg md:text-xl font-semibold mb-6 md:mb-8">
+                  Verify OTP
+                </h2>
+                <form onSubmit={handleOTPSubmit} className="space-y-4 md:space-y-5">
+                  <div>
+                    <label className="block text-white text-sm mb-2">
+                      Enter OTP *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.otp}
+                      onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-blue-700 bg-opacity-50 border border-blue-600 rounded text-white text-sm placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent tracking-widest text-center text-lg"
+                      placeholder="000000"
+                      maxLength="6"
+                      required
+                    />
+                    <p className="text-blue-200 text-xs mt-2">
+                      OTP sent to {formData.email}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <button
+                      type="submit"
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                    >
+                      VERIFY OTP
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResendOTP}
+                      className="bg-blue-700 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                    >
+                      RESEND
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* Step 3: New Password */}
+            {step === 3 && (
+              <>
+                <h2 className="text-white text-lg md:text-xl font-semibold mb-6 md:mb-8">
+                  Create New Password
+                </h2>
+                <form onSubmit={handlePasswordSubmit} className="space-y-4 md:space-y-5">
+                  <div>
+                    <label className="block text-white text-sm mb-2">
+                      New Password *
+                    </label>
+                    <input
+                      type="password"
+                      value={formData.newPassword}
+                      onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-blue-700 bg-opacity-50 border border-blue-600 rounded text-white text-sm placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      placeholder="Enter new password"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-sm mb-2">
+                      Confirm Password *
+                    </label>
+                    <input
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      className="w-full px-4 py-2.5 bg-blue-700 bg-opacity-50 border border-blue-600 rounded text-white text-sm placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                      placeholder="Confirm new password"
+                      required
+                    />
+                  </div>
+
+                  <div className="pt-4">
+                    <button
+                      type="submit"
+                      className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                    >
+                      RESET PASSWORD
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent transition"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-900 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-800 hover:to-blue-600 transition duration-200 shadow-lg hover:shadow-xl"
-            >
-              Send Reset Link
-            </button>
-          </form>
-        )}
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => navigate('/login')}
-            className="text-blue-900 font-semibold hover:text-blue-800"
-          >
-            ← Back to Login
-          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default ForgotPassword;

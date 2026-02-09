@@ -1,3 +1,88 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom blue dark theme styles */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  @apply bg-gray-950;
+}
+
+/* Custom blue theme overrides */
+.dark .dark\:bg-gray-900 {
+  background-color: #0c4a6e !important; /* Blue-900 */
+}
+
+.dark .dark\:border-blue-800 {
+  border-color: #075985 !important; /* Blue-800 */
+}
+
+.dark .dark\:bg-blue-900 {
+  background-color: #0c4a6e !important; /* Blue-900 */
+}
+
+.dark .dark\:border-blue-800 {
+  border-color: #075985 !important; /* Blue-800 */
+}
+
+.dark .dark\:hover\:bg-blue-800:hover {
+  background-color: #075985 !important; /* Blue-800 */
+}
+
+.dark .dark\:text-blue-100 {
+  color: #e0f2fe !important; /* Blue-50 */
+}
+
+.dark .dark\:text-blue-200 {
+  color: #bae6fd !important; /* Blue-200 */
+}
+
+.dark .dark\:text-blue-400 {
+  color: #38bdf8 !important; /* Blue-400 */
+}
+
+.dark .dark\:bg-blue-900\/20 {
+  background-color: rgba(12, 74, 110, 0.2) !important;
+}
+
+.dark .dark\:placeholder-blue-400::placeholder {
+  color: #38bdf8 !important; /* Blue-400 */
+}
+
+/* Text colors for dark mode */
+.dark .dark\:text-gray-200 {
+  color: #e0f2fe !important; /* Blue-50 */
+}
+
+.dark .dark\:text-gray-300 {
+  color: #bae6fd !important; /* Blue-200 */
+}
+
+.dark .dark\:text-gray-400 {
+  color: #7dd3fc !important; /* Blue-300 */
+}
+
+.dark .dark\:text-gray-500 {
+  color: #38bdf8 !important; /* Blue-400 */
+}
+
+/* Background colors for dark mode */
+.dark .dark\:bg-gray-800 {
+  background-color: #075985 !important; /* Blue-800 */
+}
+
+.dark .dark\:bg-gray-700 {
+  background-color: #0369a1 !important; /* Blue-700 */
+}
+
+.dark .dark\:hover\:bg-gray-700:hover {
+  background-color: #0284c7 !important; /* Blue-600 */
+}
+
+.dark .dark\:hover\:bg-gray-800:hover {
+  background-color: #0369a1 !important; /* Blue-700 */
+}
+
