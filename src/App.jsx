@@ -1,8 +1,12 @@
-import VTCRoutes from './routes/VTCRoutes';
-import './App.css'
+import React from 'react'
+import VTCRoutes from './routes/VTCRoutes'
 
 function App() {
-  return <VTCRoutes />
+  return (
+    <div>
+      <VTCRoutes/>
+    </div>
+  )
 }
 
 export default App
