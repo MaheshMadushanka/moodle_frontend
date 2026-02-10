@@ -4,8 +4,16 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#2596be', // Fjord Signal
+          light: '#38bdf8',
+          dark: '#1e40af',
+        },
+      },
       animation: {
         'blob': 'blob 7s infinite',
       },
@@ -29,4 +37,3 @@ export default {
   },
   plugins: [],
 }
-
