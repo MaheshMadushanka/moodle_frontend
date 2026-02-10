@@ -1,38 +1,33 @@
-// Layout.jsx
-import React, { useState } from 'react'
+import React from 'react'
 import Navbar from '../navbar/Navbar'
 import Sidebar from '../sidebar/Sidebar'
 import { useTheme } from '../../contexts/ThemeContext'
+import { Outlet } from 'react-router-dom'
 
-function Layout({ children }) {
+function Layout() {
   const { isDarkMode } = useTheme()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className={`flex min-h-screen ${isDarkMode ? 'dark:bg-gray-950' : 'bg-gray-50'}`}>
       {/* Sidebar - Fixed on left */}
-      <Sidebar />
+      <div className="sticky top-0 h-screen z-40">
+        <Sidebar />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col w-full lg:w-auto lg:ml-0">
-        {/* Navbar at top */}
-        <Navbar onMenuClick={() => setSidebarOpen(true)} />
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Navbar at top - Fixed */}
+        <div className="sticky top-0 z-30">
+          <Navbar onMenuClick={() => {}} />
+        </div>
         
-        {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-6">
+        {/* Page Content - Use Outlet here */}
+        <main className="flex-1 p-4 lg:p-6 overflow-auto">
           <div className="max-w-7xl mx-auto w-full">
-            {children}
+            <Outlet />
           </div>
         </main>
       </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
     </div>
   )
 }

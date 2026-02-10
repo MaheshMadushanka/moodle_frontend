@@ -19,13 +19,15 @@ export const ThemeProvider = ({ children }) => {
       root.style.setProperty('--sidebar-border', '#075985') // Blue-800
       root.style.setProperty('--navbar-bg', '#0c4a6e') // Blue-900
       root.style.setProperty('--navbar-border', '#075985') // Blue-800
+      root.style.setProperty('--body-bg', '#0f172a') // Gray-950
     } else {
       root.classList.remove('dark')
-      // Reset to default colors
-      root.style.setProperty('--sidebar-bg', '#ffffff')
-      root.style.setProperty('--sidebar-border', '#f3f4f6')
-      root.style.setProperty('--navbar-bg', '#ffffff')
-      root.style.setProperty('--navbar-border', '#f3f4f6')
+      // Set light blue theme variables
+      root.style.setProperty('--sidebar-bg', '#f0f9ff') // Blue-50
+      root.style.setProperty('--sidebar-border', '#bae6fd') // Blue-200
+      root.style.setProperty('--navbar-bg', '#f0f9ff') // Blue-50
+      root.style.setProperty('--navbar-border', '#bae6fd') // Blue-200
+      root.style.setProperty('--body-bg', '#f8fbff') // Light blue background
     }
   }, [isDarkMode])
 

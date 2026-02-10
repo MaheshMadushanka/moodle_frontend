@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Bell, Search, User, LogOut, Settings, HelpCircle, Menu, X } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 function Navbar({ onMenuClick }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -9,8 +11,8 @@ function Navbar({ onMenuClick }) {
   const dropdownRef = useRef(null)
   const searchRef = useRef(null)
   const { isDarkMode } = useTheme()
+  const navigate = useNavigate()
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -21,7 +23,6 @@ function Navbar({ onMenuClick }) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Focus search input when mobile search is shown
   useEffect(() => {
     if (showMobileSearch && searchRef.current) {
       searchRef.current.focus()
@@ -29,14 +30,58 @@ function Navbar({ onMenuClick }) {
   }, [showMobileSearch])
 
   const handleLogout = () => {
-    console.log('Logging out...')
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to logout?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, logout!',
+      cancelButtonText: 'Cancel',
+      background: isDarkMode ? '#1e3a8a' : '#ffffff',
+      color: isDarkMode ? '#e0f2fe' : '#1e293b',
+      customClass: {
+        popup: isDarkMode ? 'dark-mode-popup' : '',
+        title: isDarkMode ? 'text-blue-100' : 'text-blue-900',
+        htmlContainer: isDarkMode ? 'text-blue-200' : 'text-blue-800'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Close the dropdown
+        setIsProfileOpen(false)
+        
+        // Show success message
+        Swal.fire({
+          title: 'Logged Out!',
+          text: 'You have been successfully logged out.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          background: isDarkMode ? '#1e3a8a' : '#ffffff',
+          color: isDarkMode ? '#e0f2fe' : '#1e293b',
+          customClass: {
+            popup: isDarkMode ? 'dark-mode-popup' : '',
+            title: isDarkMode ? 'text-blue-100' : 'text-blue-900'
+          }
+        }).then(() => {
+          // Clear any stored user data (localStorage, sessionStorage, etc.)
+          localStorage.removeItem('user')
+          localStorage.removeItem('token')
+          sessionStorage.clear()
+          
+          // Navigate to login page
+          navigate('/')
+        })
+      }
+    })
   }
 
   return (
     <div 
       className={`
         h-16 px-4 sm:px-6
-        ${isDarkMode ? 'dark:bg-gray-900 dark:border-blue-800' : 'bg-white border-gray-100'}
+        ${isDarkMode ? 'dark:bg-gray-900 dark:border-blue-800' : 'bg-blue-50 border-blue-200'}
         border-b
         flex items-center justify-between gap-4
         font-sans
@@ -51,7 +96,7 @@ function Navbar({ onMenuClick }) {
             lg:hidden p-2 rounded-lg
             ${isDarkMode 
               ? 'dark:hover:bg-gray-800 dark:text-gray-200' 
-              : 'hover:bg-gray-50 text-gray-600'
+              : 'hover:bg-blue-100 text-blue-800'
             }
           `}
         >
@@ -71,7 +116,7 @@ function Navbar({ onMenuClick }) {
         `}>
           <Search className={`
             absolute left-3 w-5 h-5
-            ${isDarkMode ? 'text-blue-400' : 'text-gray-400'}
+            ${isDarkMode ? 'text-blue-400' : 'text-blue-500'}
           `} />
           <input
             ref={searchRef}
@@ -83,9 +128,9 @@ function Navbar({ onMenuClick }) {
               w-full pl-10 pr-4 py-2.5 rounded-lg
               ${isDarkMode 
                 ? 'dark:bg-blue-900/20 dark:text-blue-100 dark:placeholder-blue-400' 
-                : 'bg-gray-50 text-gray-900 placeholder-gray-400'
+                : 'bg-blue-100 text-blue-900 placeholder-blue-400'
               }
-              border ${isDarkMode ? 'dark:border-blue-800' : 'border-transparent'}
+              border ${isDarkMode ? 'dark:border-blue-800' : 'border-blue-300'}
               focus:outline-none
               transition-all
               text-sm sm:text-base
@@ -96,7 +141,7 @@ function Navbar({ onMenuClick }) {
               onClick={() => setShowMobileSearch(false)}
               className="md:hidden absolute right-3 p-1"
             >
-              <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              <X className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-blue-500'}`} />
             </button>
           )}
         </div>
@@ -112,7 +157,7 @@ function Navbar({ onMenuClick }) {
               md:hidden p-2 rounded-lg
               ${isDarkMode 
                 ? 'dark:hover:bg-gray-800 dark:text-gray-200' 
-                : 'hover:bg-gray-50 text-gray-600'
+                : 'hover:bg-blue-100 text-blue-800'
               }
             `}
           >
@@ -128,23 +173,23 @@ function Navbar({ onMenuClick }) {
                 transition-all
                 ${isDarkMode 
                   ? 'dark:hover:bg-blue-800 dark:text-blue-100' 
-                  : 'hover:bg-gray-50 text-gray-900'
+                  : 'hover:bg-blue-100 text-blue-900'
                 }
               `}
             >
               {/* Profile Icon with Blue Transparent Background */}
               <div className="relative">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
                 <span className="absolute bottom-0 right-0 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
               </div>
               
               <div className="text-left hidden sm:block">
-                <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-gray-900'}`}>
+                <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-blue-900'}`}>
                   John Doe
                 </p>
-                <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-gray-500'}`}>
+                <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
                   Student
                 </p>
               </div>
@@ -155,16 +200,16 @@ function Navbar({ onMenuClick }) {
               <div 
                 className={`
                   absolute right-0 mt-2 w-56 rounded-xl shadow-lg
-                  ${isDarkMode ? 'dark:bg-blue-900 dark:border-blue-800' : 'bg-white border border-gray-100'}
+                  ${isDarkMode ? 'dark:bg-blue-900 dark:border-blue-800' : 'bg-blue-50 border border-blue-200'}
                   overflow-hidden z-50
                 `}
               >
                 {/* User Info */}
-                <div className={`px-4 py-3 border-b ${isDarkMode ? 'dark:border-blue-800' : 'border-gray-100'}`}>
-                  <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-gray-900'}`}>
+                <div className={`px-4 py-3 border-b ${isDarkMode ? 'dark:border-blue-800' : 'border-blue-200'}`}>
+                  <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-blue-900'}`}>
                     John Doe
                   </p>
-                  <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-gray-500'}`}>
+                  <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
                     john.doe@vtc.edu
                   </p>
                 </div>
@@ -178,7 +223,7 @@ function Navbar({ onMenuClick }) {
                       transition-all
                       ${isDarkMode 
                         ? 'dark:hover:bg-blue-800 dark:text-blue-200' 
-                        : 'hover:bg-gray-50 text-gray-700'
+                        : 'hover:bg-blue-100 text-blue-800'
                       }
                     `}
                   >
@@ -193,7 +238,7 @@ function Navbar({ onMenuClick }) {
                       transition-all
                       ${isDarkMode 
                         ? 'dark:hover:bg-blue-800 dark:text-blue-200' 
-                        : 'hover:bg-gray-50 text-gray-700'
+                        : 'hover:bg-blue-100 text-blue-800'
                       }
                     `}
                   >
@@ -208,7 +253,7 @@ function Navbar({ onMenuClick }) {
                       transition-all
                       ${isDarkMode 
                         ? 'dark:hover:bg-blue-800 dark:text-blue-200' 
-                        : 'hover:bg-gray-50 text-gray-700'
+                        : 'hover:bg-blue-100 text-blue-800'
                       }
                     `}
                   >
@@ -218,7 +263,7 @@ function Navbar({ onMenuClick }) {
                 </div>
 
                 {/* Logout */}
-                <div className={`border-t ${isDarkMode ? 'dark:border-blue-800' : 'border-gray-100'} py-2`}>
+                <div className={`border-t ${isDarkMode ? 'dark:border-blue-800' : 'border-blue-200'} py-2`}>
                   <button
                     onClick={handleLogout}
                     className={`
@@ -226,7 +271,7 @@ function Navbar({ onMenuClick }) {
                       transition-all
                       ${isDarkMode 
                         ? 'dark:hover:bg-red-900/20 dark:text-red-400' 
-                        : 'hover:bg-red-50 text-red-600'
+                        : 'hover:bg-red-100 text-red-600'
                       }
                     `}
                   >
