@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import React, { useState } from 'react'
 import { 
   Home, 
@@ -37,7 +36,7 @@ function Sidebar() {
 
   const handleMenuItemClick = (label) => {
     setActiveItem(label)
-    setIsSidebarOpen(false) // Close sidebar on mobile after clicking
+    setIsSidebarOpen(false)
   }
 
   return (
@@ -50,7 +49,7 @@ function Sidebar() {
           p-2 rounded-lg
           ${isDarkMode 
             ? 'bg-gray-800 text-gray-200' 
-            : 'bg-white text-gray-700 shadow-md'
+            : 'bg-blue-50 text-blue-700 shadow-md'
           }
         `}
       >
@@ -72,8 +71,8 @@ function Sidebar() {
           w-72 h-screen
           transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          ${isDarkMode ? 'bg-gray-900' : 'bg-white'}
-          border-r ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}
+          ${isDarkMode ? 'bg-gray-900' : 'bg-blue-50'}
+          border-r ${isDarkMode ? 'border-gray-800' : 'border-blue-200'}
           flex flex-col
           font-sans
         `}
@@ -83,11 +82,11 @@ function Sidebar() {
           onClick={() => setIsSidebarOpen(false)}
           className="lg:hidden absolute top-4 right-4 p-1"
         >
-          <X className={`w-6 h-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+          <X className={`w-6 h-6 ${isDarkMode ? 'text-gray-400' : 'text-blue-600'}`} />
         </button>
 
         {/* Logo Section */}
-        <div className={`p-6 flex items-center justify-center border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}`}>
+        <div className={`p-6 flex items-center justify-center border-b ${isDarkMode ? 'border-gray-800' : 'border-blue-200'}`}>
           <img 
             src={vtclogo} 
             alt="VTC Logo" 
@@ -112,10 +111,10 @@ function Sidebar() {
                       ${isActive
                         ? isDarkMode 
                           ? 'bg-blue-900/30 text-blue-400' 
-                          : 'bg-blue-50 text-blue-600'
+                          : 'bg-blue-100 text-blue-600'
                         : isDarkMode
                           ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          : 'text-blue-800 hover:bg-blue-100 hover:text-blue-900'
                       }
                     `}
                   >
@@ -133,7 +132,7 @@ function Sidebar() {
         {/* Theme Toggle */}
         <div className={`
           px-4 py-3 mx-4 mb-4 rounded-xl
-          ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}
+          ${isDarkMode ? 'bg-gray-800' : 'bg-blue-100'}
           flex items-center justify-center gap-2
         `}>
           <button
@@ -141,7 +140,7 @@ function Sidebar() {
             className={`
               flex items-center gap-2 px-4 py-2 rounded-lg transition-all
               ${!isDarkMode 
-                ? 'bg-white text-gray-900 shadow-sm' 
+                ? 'bg-blue-50 text-blue-900 shadow-sm' 
                 : 'text-gray-400 hover:text-gray-200'
               }
             `}
@@ -156,7 +155,7 @@ function Sidebar() {
               flex items-center gap-2 px-4 py-2 rounded-lg transition-all
               ${isDarkMode 
                 ? 'bg-blue-700 text-white shadow-sm' 
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-blue-700 hover:text-blue-900'
               }
             `}
           >
