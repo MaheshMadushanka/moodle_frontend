@@ -3,7 +3,10 @@ import { Bell, Search, User, LogOut, Settings, HelpCircle, Menu, X } from 'lucid
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
+<<<<<<< HEAD
 import { userAPI } from '../../apis/api' // Adjust the import path based on your file structure
+=======
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
 
 function Navbar({ onMenuClick }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -15,6 +18,7 @@ function Navbar({ onMenuClick }) {
   const searchRef = useRef(null)
   const { isDarkMode } = useTheme()
   const navigate = useNavigate()
+<<<<<<< HEAD
 
   // Fetch user details from API
   useEffect(() => {
@@ -94,6 +98,8 @@ function Navbar({ onMenuClick }) {
   }
 
   const userInfo = getUserInfo()
+=======
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -128,6 +134,7 @@ function Navbar({ onMenuClick }) {
         title: isDarkMode ? 'text-blue-100' : 'text-blue-900',
         htmlContainer: isDarkMode ? 'text-blue-200' : 'text-blue-800'
       }
+<<<<<<< HEAD
     }).then(async (result) => {
       if (result.isConfirmed) {
         setIsProfileOpen(false)
@@ -150,6 +157,14 @@ function Navbar({ onMenuClick }) {
         sessionStorage.removeItem('loginSuccessShown')
         sessionStorage.clear()
         
+=======
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Close the dropdown
+        setIsProfileOpen(false)
+        
+        // Show success message
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
         Swal.fire({
           title: 'Logged Out!',
           text: 'You have been successfully logged out.',
@@ -163,10 +178,20 @@ function Navbar({ onMenuClick }) {
             title: isDarkMode ? 'text-blue-100' : 'text-blue-900'
           }
         }).then(() => {
+<<<<<<< HEAD
+=======
+          // Clear any stored user data (localStorage, sessionStorage, etc.)
+          localStorage.removeItem('user')
+          localStorage.removeItem('token')
+          sessionStorage.clear()
+          
+          // Navigate to login page
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
           navigate('/')
         })
       }
     })
+<<<<<<< HEAD
   }
 
   // Handle profile navigation based on user type
@@ -193,6 +218,8 @@ function Navbar({ onMenuClick }) {
   const handleHelpClick = () => {
     setIsProfileOpen(false)
     navigate('/contactus')
+=======
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
   }
 
   return (
@@ -305,10 +332,17 @@ function Navbar({ onMenuClick }) {
               
               <div className="text-left hidden sm:block">
                 <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-blue-900'}`}>
+<<<<<<< HEAD
                   {loading ? 'Loading...' : userInfo.name}
                 </p>
                 <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
                   {loading ? '...' : userInfo.displayRole}
+=======
+                  John Doe
+                </p>
+                <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
+                  Student
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
                 </p>
               </div>
             </button>
@@ -325,6 +359,7 @@ function Navbar({ onMenuClick }) {
                 {/* User Info */}
                 <div className={`px-4 py-3 border-b ${isDarkMode ? 'dark:border-blue-800' : 'border-blue-200'}`}>
                   <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-blue-900'}`}>
+<<<<<<< HEAD
                     {loading ? 'Loading...' : userInfo.name}
                   </p>
                   <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
@@ -332,6 +367,12 @@ function Navbar({ onMenuClick }) {
                   </p>
                   <p className={`text-xs mt-1 ${isDarkMode ? 'dark:text-blue-300' : 'text-blue-600'}`}>
                     Role: {loading ? 'Loading...' : userInfo.displayRole}
+=======
+                    John Doe
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
+                    john.doe@vtc.edu
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
                   </p>
                 </div>
 
