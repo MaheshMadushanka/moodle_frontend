@@ -3,15 +3,97 @@ import { Bell, Search, User, LogOut, Settings, HelpCircle, Menu, X } from 'lucid
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
+import { userAPI } from '../../apis/api' // Adjust the import path based on your file structure
 
 function Navbar({ onMenuClick }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [searchFocus, setSearchFocus] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
+  const [userDetails, setUserDetails] = useState(null)
+  const [loading, setLoading] = useState(true)
   const dropdownRef = useRef(null)
   const searchRef = useRef(null)
   const { isDarkMode } = useTheme()
   const navigate = useNavigate()
+
+  // Fetch user details from API
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userId = localStorage.getItem('userId')
+        if (!userId) {
+          setLoading(false)
+          return
+        }
+
+        const response = await userAPI.getUserById(userId)
+        
+        if (response.status && response.response_code === 200) {
+          const userData = response.result[0]
+          setUserDetails(userData)
+        }
+        setLoading(false)
+      } catch (error) {
+        console.error('Error fetching user details:', error)
+        setLoading(false)
+      }
+    }
+
+    fetchUserDetails()
+  }, [])
+
+  // Get user information from API response
+  const getUserInfo = () => {
+    if (!userDetails) {
+      return {
+        name: 'User',
+        email: localStorage.getItem('userEmail') || 'user@vtc.ac.lk',
+        role: localStorage.getItem('userRole') || 'student',
+        displayRole: 'User',
+        userType: null
+      }
+    }
+
+    let name = 'User'
+    let role = 'student'
+    let displayRole = 'Student'
+    let userType = null
+
+    // Check if user is a lecturer
+    if (userDetails.lectures && userDetails.lectures.length > 0) {
+      const lectureData = userDetails.lectures[0]
+      name = lectureData.full_name
+      role = lectureData.role.position
+      displayRole = 'Lecturer'
+      userType = 'lecturer'
+    }
+    // Check if user is a student
+    else if (userDetails.students && userDetails.students.length > 0) {
+      const studentData = userDetails.students[0]
+      name = studentData.full_name
+      role = studentData.role.position
+      displayRole = 'Student'
+      userType = 'student'
+    }
+    // Check if user is an admin
+    else if (userDetails.admins && userDetails.admins.length > 0) {
+      const adminData = userDetails.admins[0]
+      name = adminData.full_name || 'Admin'
+      role = adminData.role?.position || 'admin'
+      displayRole = 'Admin'
+      userType = 'admin'
+    }
+
+    return {
+      name: name,
+      email: userDetails.email,
+      role: role,
+      displayRole: displayRole,
+      userType: userType
+    }
+  }
+
+  const userInfo = getUserInfo()
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -46,12 +128,28 @@ function Navbar({ onMenuClick }) {
         title: isDarkMode ? 'text-blue-100' : 'text-blue-900',
         htmlContainer: isDarkMode ? 'text-blue-200' : 'text-blue-800'
       }
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // Close the dropdown
         setIsProfileOpen(false)
         
-        // Show success message
+        // Optional: Call logout API if endpoint exists
+        try {
+          await userAPI.logout();
+        } catch (error) {
+          console.error('Logout API error:', error);
+          // Continue with local logout even if API fails
+        }
+        
+        // Clear all localStorage items
+        localStorage.removeItem('token')
+        localStorage.removeItem('userId')
+        localStorage.removeItem('userRole')
+        localStorage.removeItem('userRolePosition')
+        localStorage.removeItem('userEmail')
+        localStorage.removeItem('isAuthenticated')
+        sessionStorage.removeItem('loginSuccessShown')
+        sessionStorage.clear()
+        
         Swal.fire({
           title: 'Logged Out!',
           text: 'You have been successfully logged out.',
@@ -65,16 +163,36 @@ function Navbar({ onMenuClick }) {
             title: isDarkMode ? 'text-blue-100' : 'text-blue-900'
           }
         }).then(() => {
-          // Clear any stored user data (localStorage, sessionStorage, etc.)
-          localStorage.removeItem('user')
-          localStorage.removeItem('token')
-          sessionStorage.clear()
-          
-          // Navigate to login page
           navigate('/')
         })
       }
     })
+  }
+
+  // Handle profile navigation based on user type
+  const handleProfileClick = () => {
+    setIsProfileOpen(false)
+    if (userInfo.userType === 'student') {
+      navigate('/studentprofile')
+    } else if (userInfo.userType === 'lecturer') {
+      navigate('/lecturerprofile')
+    } else if (userInfo.userType === 'admin') {
+      navigate('/profile') // Default profile page for admin
+    } else {
+      navigate('/profile') // Fallback
+    }
+  }
+
+  // Handle settings navigation
+  const handleSettingsClick = () => {
+    setIsProfileOpen(false)
+    navigate('/settings')
+  }
+
+  // Handle help & support navigation
+  const handleHelpClick = () => {
+    setIsProfileOpen(false)
+    navigate('/contactus')
   }
 
   return (
@@ -187,10 +305,10 @@ function Navbar({ onMenuClick }) {
               
               <div className="text-left hidden sm:block">
                 <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-blue-900'}`}>
-                  John Doe
+                  {loading ? 'Loading...' : userInfo.name}
                 </p>
                 <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
-                  Student
+                  {loading ? '...' : userInfo.displayRole}
                 </p>
               </div>
             </button>
@@ -207,17 +325,20 @@ function Navbar({ onMenuClick }) {
                 {/* User Info */}
                 <div className={`px-4 py-3 border-b ${isDarkMode ? 'dark:border-blue-800' : 'border-blue-200'}`}>
                   <p className={`text-sm font-medium ${isDarkMode ? 'dark:text-blue-100' : 'text-blue-900'}`}>
-                    John Doe
+                    {loading ? 'Loading...' : userInfo.name}
                   </p>
                   <p className={`text-xs ${isDarkMode ? 'dark:text-blue-400' : 'text-blue-700'}`}>
-                    john.doe@vtc.edu
+                    {loading ? 'Loading...' : userInfo.email}
+                  </p>
+                  <p className={`text-xs mt-1 ${isDarkMode ? 'dark:text-blue-300' : 'text-blue-600'}`}>
+                    Role: {loading ? 'Loading...' : userInfo.displayRole}
                   </p>
                 </div>
 
                 {/* Menu Items */}
                 <div className="py-2">
                   <button
-                    onClick={() => setIsProfileOpen(false)}
+                    onClick={handleProfileClick}
                     className={`
                       w-full flex items-center gap-3 px-4 py-2.5
                       transition-all
@@ -232,7 +353,7 @@ function Navbar({ onMenuClick }) {
                   </button>
 
                   <button
-                    onClick={() => setIsProfileOpen(false)}
+                    onClick={handleSettingsClick}
                     className={`
                       w-full flex items-center gap-3 px-4 py-2.5
                       transition-all
@@ -247,7 +368,7 @@ function Navbar({ onMenuClick }) {
                   </button>
 
                   <button
-                    onClick={() => setIsProfileOpen(false)}
+                    onClick={handleHelpClick}
                     className={`
                       w-full flex items-center gap-3 px-4 py-2.5
                       transition-all

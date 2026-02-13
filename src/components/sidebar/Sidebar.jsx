@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   Home, 
   BookOpen, 
@@ -10,34 +10,142 @@ import {
   Sun,
   Moon,
   Menu,
-  X
+  X,
+  Users,
+  ClipboardList,
+  BookMarked,
+  Settings,
+  BarChart,
+  FileCheck
 } from 'lucide-react'
 import vtclogo from "../../assets/vtclogo2.png"
 import { useTheme } from '../../contexts/ThemeContext'
+import { useNavigate } from 'react-router-dom'
+import { userAPI } from '../../apis/api' // Adjust the import path based on your file structure
 
 function Sidebar() {
+  const navigate = useNavigate()
   const [activeItem, setActiveItem] = useState('Dashboard')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [userRole, setUserRole] = useState('student')
+  const [userDetails, setUserDetails] = useState(null)
+  const [loading, setLoading] = useState(true)
   const { isDarkMode, setTheme } = useTheme()
 
-  const menuItems = [
-    { icon: Home, label: 'Dashboard' },
-    { icon: BookOpen, label: 'My Courses' },
-    { icon: FileText, label: 'Assessments' },
-    { icon: Calendar, label: 'Attendance' },
-    { icon: Award, label: 'Results' },
-    { icon: MessageSquare, label: 'Messages' },
-    { icon: User, label: 'Profile' }
+  // Fetch user details from API to get role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const userId = localStorage.getItem('userId')
+        const storedRole = localStorage.getItem('userRole')
+        
+        // First, try to get role from localStorage (faster)
+        if (storedRole) {
+          setUserRole(storedRole)
+        }
+
+        // Then fetch from API to get the most accurate data
+        if (userId) {
+          const response = await userAPI.getUserById(userId)
+          
+          if (response.status && response.response_code === 200) {
+            const userData = response.result[0]
+            setUserDetails(userData)
+            
+            // Determine user role from API response
+            let role = 'student'
+            if (userData.lectures && userData.lectures.length > 0) {
+              role = 'lecturer'
+            } else if (userData.admins && userData.admins.length > 0) {
+              role = 'admin'
+            } else if (userData.students && userData.students.length > 0) {
+              role = 'student'
+            }
+            
+            setUserRole(role)
+            // Update localStorage with the correct role
+            localStorage.setItem('userRole', role)
+          }
+        }
+        setLoading(false)
+      } catch (error) {
+        console.error('Error fetching user role:', error)
+        setLoading(false)
+      }
+    }
+
+    fetchUserRole()
+  }, [])
+
+  // Student Menu Items with navigation paths
+  const studentMenuItems = [
+    { icon: Home, label: 'Dashboard', path: '/studentdashboard' },
+    { icon: BookOpen, label: 'My Courses', path: '/student/courses' },
+    { icon: FileText, label: 'Assessments', path: '/student/assessments' },
+    { icon: Calendar, label: 'Attendance', path: '/student/attendance' },
+    { icon: Award, label: 'Results', path: '/student/results' },
+    { icon: MessageSquare, label: 'Messages', path: '/student/messages' },
+    { icon: User, label: 'Profile', path: '/student/profile' }
+  ]
+
+  // Lecturer Menu Items with navigation paths
+  const lecturerMenuItems = [
+    { icon: Home, label: 'Dashboard', path: '/lecturerdashboard' },
+    { icon: BookOpen, label: 'My Courses', path: '/lecturer/courses' },
+    { icon: Users, label: 'My Students', path: '/lecturer/students' },
+    { icon: ClipboardList, label: 'Assignments', path: '/lecturer/assignments' },
+    { icon: Calendar, label: 'Attendance', path: '/lecturer/attendance' },
+    { icon: FileCheck, label: 'Gradebook', path: '/lecturer/gradebook' },
+    { icon: BookMarked, label: 'Course Materials', path: '/lecturer/materials' },
+    { icon: BarChart, label: 'Analytics', path: '/lecturer/analytics' },
+    { icon: MessageSquare, label: 'Messages', path: '/lecturer/messages' },
+    { icon: User, label: 'Profile', path: '/lecturer/profile' },
+    { icon: Settings, label: 'Settings', path: '/lecturer/settings' }
+  ]
+
+  // Admin Menu Items (if you need admin role)
+  const adminMenuItems = [
+    { icon: Home, label: 'Dashboard', path: '/admindashboard' },
+    { icon: Users, label: 'Users', path: '/admin/users' },
+    { icon: BookOpen, label: 'Courses', path: '/admin/courses' },
+    { icon: Calendar, label: 'Schedule', path: '/admin/schedule' },
+    { icon: BarChart, label: 'Reports', path: '/admin/reports' },
+    { icon: Settings, label: 'Settings', path: '/admin/settings' }
   ]
 
   const handleThemeChange = (theme) => {
     setTheme(theme)
   }
 
-  const handleMenuItemClick = (label) => {
+  const handleMenuItemClick = (path, label) => {
     setActiveItem(label)
     setIsSidebarOpen(false)
+    navigate(path)
   }
+
+  // Get menu items based on role
+  const getMenuItems = () => {
+    switch(userRole) {
+      case 'lecturer':
+        return lecturerMenuItems
+      case 'admin':
+        return adminMenuItems
+      case 'student':
+      default:
+        return studentMenuItems
+    }
+  }
+
+  const menuItems = getMenuItems()
+
+  // Set active item based on current path
+  useEffect(() => {
+    const currentPath = window.location.pathname
+    const foundItem = menuItems.find(item => item.path === currentPath)
+    if (foundItem) {
+      setActiveItem(foundItem.label)
+    }
+  }, [menuItems])
 
   return (
     <>
@@ -94,6 +202,16 @@ function Sidebar() {
           />
         </div>
 
+        {/* User Role Badge (Optional) */}
+        {!loading && (
+          <div className={`px-4 py-2 mx-4 mt-2 rounded-lg text-center
+            ${isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700'}
+            text-xs font-medium uppercase tracking-wider
+          `}>
+            {userRole} Dashboard
+          </div>
+        )}
+
         {/* Navigation Menu */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-1">
@@ -104,7 +222,7 @@ function Sidebar() {
               return (
                 <div key={item.label}>
                   <button
-                    onClick={() => handleMenuItemClick(item.label)}
+                    onClick={() => handleMenuItemClick(item.path, item.label)}
                     className={`
                       w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
                       transition-all duration-200 group relative
@@ -122,6 +240,14 @@ function Sidebar() {
                     <span className="flex-1 text-left text-sm font-medium">
                       {item.label}
                     </span>
+                    
+                    {/* Active Indicator */}
+                    {isActive && (
+                      <span className={`
+                        absolute left-0 w-1 h-8 rounded-r-full
+                        ${isDarkMode ? 'bg-blue-400' : 'bg-blue-600'}
+                      `} />
+                    )}
                   </button>
                 </div>
               )
@@ -138,10 +264,10 @@ function Sidebar() {
           <button
             onClick={() => handleThemeChange('light')}
             className={`
-              flex items-center gap-2 px-4 py-2 rounded-lg transition-all
+              flex items-center gap-2 px-4 py-2 rounded-lg transition-all flex-1 justify-center
               ${!isDarkMode 
                 ? 'bg-blue-50 text-blue-900 shadow-sm' 
-                : 'text-gray-400 hover:text-gray-200'
+                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
               }
             `}
           >
@@ -152,10 +278,10 @@ function Sidebar() {
           <button
             onClick={() => handleThemeChange('dark')}
             className={`
-              flex items-center gap-2 px-4 py-2 rounded-lg transition-all
+              flex items-center gap-2 px-4 py-2 rounded-lg transition-all flex-1 justify-center
               ${isDarkMode 
                 ? 'bg-blue-700 text-white shadow-sm' 
-                : 'text-blue-700 hover:text-blue-900'
+                : 'text-blue-700 hover:text-blue-900 hover:bg-blue-200'
               }
             `}
           >
