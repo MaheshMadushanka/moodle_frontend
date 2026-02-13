@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from "../../assets/vtclogo2.png";
+import Swal from 'sweetalert2';
+import { userAPI } from '../../apis/api'; // Adjust the import path based on your file structure
 
 function Login() {
   const navigate = useNavigate();
@@ -9,11 +11,190 @@ function Login() {
     password: '',
     role: 'student'
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // Add your login logic here
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await userAPI.login(formData.email, formData.password);
+
+      if (response.status && response.response_code === 200) {
+        const { userDetails, token } = response.result;
+        
+        // Determine user role from response
+        let userRole = null;
+        let userRolePosition = null;
+        
+        if (userDetails.students && userDetails.students.length > 0) {
+          userRole = 'student';
+          userRolePosition = userDetails.students[0].role.position;
+        } else if (userDetails.lectures && userDetails.lectures.length > 0) {
+          userRole = 'lecturer';
+          userRolePosition = userDetails.lectures[0].role.position;
+        }
+
+        // Check if selected role matches the actual user role
+        if (formData.role === 'student' && userRole !== 'student') {
+          setIsLoading(false);
+          Swal.fire({
+            title: 'Role Mismatch!',
+            html: '<p style="margin: 0; font-size: 15px; line-height: 1.6;">You selected <strong>Student</strong> role,<br/>but these credentials belong to a <strong>Lecturer</strong>.<br/><strong>Please select the correct role.</strong></p>',
+            icon: 'error',
+            timer: 3000,
+            showConfirmButton: false,
+            background: 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
+            color: '#ffffff',
+            iconColor: '#fca5a5',
+            timerProgressBar: true,
+            showClass: {
+              popup: 'animate__animated animate__shakeX',
+              icon: 'animate__animated animate__tada'
+            },
+            hideClass: {
+              popup: 'animate__animated animate__fadeOutUp animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border-2 border-red-400',
+              title: 'text-xl font-bold tracking-wide mb-2',
+              htmlContainer: 'text-sm opacity-95 mt-2',
+              timerProgressBar: 'bg-gradient-to-r from-red-300 to-red-400',
+              icon: 'border-4 border-red-300'
+            },
+            didOpen: () => {
+              const popup = Swal.getPopup();
+              popup.style.padding = '2rem';
+            }
+          });
+          return;
+        }
+
+        if (formData.role === 'lecturer' && userRole !== 'lecturer') {
+          setIsLoading(false);
+          Swal.fire({
+            title: 'Role Mismatch!',
+            html: '<p style="margin: 0; font-size: 15px; line-height: 1.6;">You selected <strong>Lecturer</strong> role,<br/>but these credentials belong to a <strong>Student</strong>.<br/><strong>Please select the correct role.</strong></p>',
+            icon: 'error',
+            timer: 3000,
+            showConfirmButton: false,
+            background: 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
+            color: '#ffffff',
+            iconColor: '#fca5a5',
+            timerProgressBar: true,
+            showClass: {
+              popup: 'animate__animated animate__shakeX',
+              icon: 'animate__animated animate__tada'
+            },
+            hideClass: {
+              popup: 'animate__animated animate__fadeOutUp animate__faster'
+            },
+            customClass: {
+              popup: 'rounded-2xl shadow-2xl border-2 border-red-400',
+              title: 'text-xl font-bold tracking-wide mb-2',
+              htmlContainer: 'text-sm opacity-95 mt-2',
+              timerProgressBar: 'bg-gradient-to-r from-red-300 to-red-400',
+              icon: 'border-4 border-red-300'
+            },
+            didOpen: () => {
+              const popup = Swal.getPopup();
+              popup.style.padding = '2rem';
+            }
+          });
+          return;
+        }
+
+        // Store user data in localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', userDetails.id);
+        localStorage.setItem('userRole', userRole);
+        localStorage.setItem('userRolePosition', userRolePosition);
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', userDetails.email);
+
+        // Show success alert
+        Swal.fire({
+          title: 'Login Successful!',
+          html: `<p style="margin: 0; font-size: 15px; line-height: 1.6;">Welcome back!<br/>You are logged in as <strong style="color: #60a5fa;">${userRole}</strong>.</p>`,
+          icon: 'success',
+          timer: 2500,
+          showConfirmButton: false,
+          background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
+          color: '#ffffff',
+          iconColor: '#60a5fa',
+          timerProgressBar: true,
+          showClass: {
+            popup: 'animate__animated animate__fadeInDown animate__faster',
+            icon: 'animate__animated animate__bounceIn'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__fadeOutUp animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-2 border-blue-400',
+            title: 'text-xl font-bold tracking-wide mb-2',
+            htmlContainer: 'text-sm opacity-95 mt-2',
+            timerProgressBar: 'bg-gradient-to-r from-blue-300 to-blue-400',
+            icon: 'border-4 border-blue-300'
+          },
+          didOpen: () => {
+            const popup = Swal.getPopup();
+            popup.style.padding = '2rem';
+          }
+        }).then(() => {
+          // Navigate based on role
+          if (userRole === 'student') {
+            navigate('/studentdashboard');
+          } else if (userRole === 'lecturer') {
+            navigate('/lecturerdashboard');
+          }
+        });
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Login error:', error);
+      
+      // Show error alert
+      Swal.fire({
+        title: 'Login Failed!',
+        html: '<p style="margin: 0; font-size: 15px; line-height: 1.6;">Invalid email or password.<br/><strong>Please try again.</strong></p>',
+        icon: 'error',
+        timer: 2500,
+        showConfirmButton: false,
+        background: 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)',
+        color: '#ffffff',
+        iconColor: '#fca5a5',
+        timerProgressBar: true,
+        showClass: {
+          popup: 'animate__animated animate__shakeX',
+          icon: 'animate__animated animate__tada'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp animate__faster'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl border-2 border-red-400',
+          title: 'text-xl font-bold tracking-wide mb-2',
+          htmlContainer: 'text-sm opacity-95 mt-2',
+          timerProgressBar: 'bg-gradient-to-r from-red-300 to-red-400',
+          icon: 'border-4 border-red-300'
+        },
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          popup.style.padding = '2rem';
+        }
+      });
+    }
+  };
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    setFormData({
+      ...formData,
+      role: selectedRole
+    });
   };
 
   return (
@@ -30,6 +211,7 @@ function Login() {
           <p className="text-gray-600 text-center mt-3 md:mt-4 text-sm md:text-base">
             Please login using your details
           </p>
+          
         </div>
 
         {/* Right Side - Login Form */}
@@ -38,6 +220,12 @@ function Login() {
             <h2 className="text-white text-lg md:text-xl font-semibold mb-6 md:mb-8">
               Login into your account
             </h2>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-400 rounded text-white text-xs">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
               
@@ -48,7 +236,7 @@ function Login() {
                 </label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  onChange={handleRoleChange}
                   className="w-full px-4 py-2.5 bg-blue-700 bg-opacity-50 border border-blue-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                   style={{ 
                     backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%23fff\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")',
@@ -98,9 +286,10 @@ function Login() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm"
+                  disabled={isLoading}
+                  className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-8 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  LOG IN
+                  {isLoading ? 'LOGGING IN...' : 'LOG IN'}
                 </button>
               </div>
 
@@ -112,12 +301,12 @@ function Login() {
                 >
                   I CAN'T ACCESS MY ACCOUNT
                 </Link>
-                <Link
+                {/* <Link
                   to="/signup"
                   className="text-blue-200 hover:text-white text-xs font-medium transition-colors uppercase tracking-wide text-center"
                 >
                   SIGN UP
-                </Link>
+                </Link> */}
               </div>
             </form>
           </div>

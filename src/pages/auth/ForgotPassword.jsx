@@ -13,38 +13,57 @@ function ForgotPassword() {
     confirmPassword: ''
   });
 
-  const handleEmailSubmit = (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
     console.log('Email submitted:', formData.email);
     
     // Show loading toast
     const loadingToast = toast.loading('Sending OTP...');
     
-    // Simulate API call
-    setTimeout(() => {
-      toast.dismiss(loadingToast);
-      toast.success('OTP sent successfully to your email!', {
-        duration: 4000,
-        icon: '📧',
+    try {
+      const response = await fetch('http://13.203.160.138:8070/api/user/sendOTP', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email
+        })
       });
-      setStep(2);
-    }, 1500);
+
+      const data = await response.json();
+      
+      toast.dismiss(loadingToast);
+      
+      if (data.response_code === 200) {
+        toast.success('OTP sent successfully to your email!', {
+          duration: 4000,
+          icon: '📧',
+        });
+        setStep(2);
+      } else {
+        toast.error(data.message || 'Failed to send OTP. Please try again.', {
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      console.error('Error sending OTP:', error);
+      toast.error('Network error. Please try again.', {
+        duration: 4000,
+      });
+    }
   };
 
   const handleOTPSubmit = (e) => {
     e.preventDefault();
     
     if (formData.otp) {
-      const loadingToast = toast.loading('Verifying OTP...');
-      
-      setTimeout(() => {
-        toast.dismiss(loadingToast);
-        toast.success('OTP verified successfully!', {
-          duration: 3000,
-          icon: '✅',
-        });
-        setStep(3);
-      }, 1000);
+      toast.success('OTP verified! Please set your new password.', {
+        duration: 3000,
+        icon: '✅',
+      });
+      setStep(3);
     } else {
       toast.error('Please enter OTP', {
         duration: 3000,
@@ -52,7 +71,7 @@ function ForgotPassword() {
     }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.newPassword.length < 6) {
@@ -63,11 +82,34 @@ function ForgotPassword() {
       return;
     }
     
-    if (formData.newPassword === formData.confirmPassword) {
-      const loadingToast = toast.loading('Resetting password...');
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error('Passwords do not match!', {
+        duration: 3000,
+        icon: '❌',
+      });
+      return;
+    }
+
+    const loadingToast = toast.loading('Resetting password...');
+    
+    try {
+      const response = await fetch('http://13.203.160.138:8070/api/user/validateOTPForFPW', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          enteredOTP: formData.otp,
+          newPassword: formData.newPassword
+        })
+      });
+
+      const data = await response.json();
       
-      setTimeout(() => {
-        toast.dismiss(loadingToast);
+      toast.dismiss(loadingToast);
+      
+      if (data.response_code === 200 && data.status === true) {
         toast.success('Password reset successful! Redirecting to login...', {
           duration: 3000,
           icon: '🎉',
@@ -77,25 +119,55 @@ function ForgotPassword() {
         setTimeout(() => {
           navigate('/');
         }, 3000);
-      }, 1500);
-    } else {
-      toast.error('Passwords do not match!', {
-        duration: 3000,
-        icon: '❌',
+      } else {
+        toast.error(data.message || 'Invalid OTP or password reset failed. Please try again.', {
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      console.error('Error resetting password:', error);
+      toast.error('Network error. Please try again.', {
+        duration: 4000,
       });
     }
   };
 
-  const handleResendOTP = () => {
+  const handleResendOTP = async () => {
     const loadingToast = toast.loading('Resending OTP...');
     
-    setTimeout(() => {
-      toast.dismiss(loadingToast);
-      toast.success('OTP resent successfully!', {
-        duration: 3000,
-        icon: '🔄',
+    try {
+      const response = await fetch('http://13.203.160.138:8070/api/user/sendOTP', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email
+        })
       });
-    }, 1500);
+
+      const data = await response.json();
+      
+      toast.dismiss(loadingToast);
+      
+      if (data.response_code === 200) {
+        toast.success('OTP resent successfully!', {
+          duration: 3000,
+          icon: '🔄',
+        });
+      } else {
+        toast.error(data.message || 'Failed to resend OTP. Please try again.', {
+          duration: 4000,
+        });
+      }
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      console.error('Error resending OTP:', error);
+      toast.error('Network error. Please try again.', {
+        duration: 4000,
+      });
+    }
   };
 
   return (
