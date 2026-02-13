@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react'
+=======
+import React, { useState } from 'react'
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
 import { 
   Home, 
   BookOpen, 
@@ -120,7 +124,10 @@ function Sidebar() {
   const handleMenuItemClick = (path, label) => {
     setActiveItem(label)
     setIsSidebarOpen(false)
+<<<<<<< HEAD
     navigate(path)
+=======
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
   }
 
   // Get menu items based on role
@@ -267,7 +274,11 @@ function Sidebar() {
               flex items-center gap-2 px-4 py-2 rounded-lg transition-all flex-1 justify-center
               ${!isDarkMode 
                 ? 'bg-blue-50 text-blue-900 shadow-sm' 
+<<<<<<< HEAD
                 : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+=======
+                : 'text-gray-400 hover:text-gray-200'
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
               }
             `}
           >
@@ -281,7 +292,11 @@ function Sidebar() {
               flex items-center gap-2 px-4 py-2 rounded-lg transition-all flex-1 justify-center
               ${isDarkMode 
                 ? 'bg-blue-700 text-white shadow-sm' 
+<<<<<<< HEAD
                 : 'text-blue-700 hover:text-blue-900 hover:bg-blue-200'
+=======
+                : 'text-blue-700 hover:text-blue-900'
+>>>>>>> 9e9621dea0b3adf3556e168b9daacbc0124df3d4
               }
             `}
           >
